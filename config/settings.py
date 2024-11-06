@@ -31,6 +31,8 @@ INSTALLED_APPS = [
     'drf_yasg',
     'corsheaders',
     # my_apps
+    'author',
+    'book',
 
 ]
 
