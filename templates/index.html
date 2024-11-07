@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Authors List</title>
+</head>
+<body>
+    <h1>Authors CRUD</h1>
+
+    <!-- Кнопки для CRUD операций -->
+    <button id="load-authors">Load Authors</button>
+    <button id="create-author">Create Author</button>
+
+    <h2>Author List</h2>
+    <ul id="author-list"></ul>
+
+    <!-- Форма для создания нового автора -->
+    <div id="create-author-form" style="display:none;">
+        <h3>Create Author</h3>
+        <input type="text" id="author-name" placeholder="Author Name" required />
+        <textarea id="author-bio" placeholder="Author Bio"></textarea>
+        <button id="submit-author">Submit</button>
+        <button id="cancel-create">Cancel</button>
+    </div>
+
+    <script>
+        const apiUrl = 'http://127.0.0.1:8000/api/author/'; //
+
+        // Функция для загрузки авторов
+        async function loadAuthors() {
+            try {
+                const response = await fetch(apiUrl);
+                if (!response.ok) {
+                    throw new Error('Failed to load authors');
+                }
+                const authors = await response.json();
+                const authorList = document.getElementById('author-list');
+                authorList.innerHTML = ''; // Очистить список
+
+                authors.forEach(author => {
+                    const li = document.createElement('li');
+                    li.textContent = `${author.name}: ${author.bio}`;
+                    authorList.appendChild(li);
+                });
+            } catch (error) {
+                console.error('Error fetching authors:', error);
+            }
+        }
+
+        // Функция для создания нового автора
+        async function createAuthor() {
+            const name = document.getElementById('author-name').value;
+            const bio = document.getElementById('author-bio').value;
+
+            if (!name || !bio) {
+                alert('Name and Bio are required!');
+                return;
+            }
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ name, bio }),
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to create author');
+                }
+
+                const newAuthor = await response.json();
+                alert('Author created successfully!');
+                loadAuthors(); // Перезагружаем список авторов
+                document.getElementById('create-author-form').style.display = 'none'; // Скрыть форму
+            } catch (error) {
+                console.error('Error creating author:', error);
+            }
+        }
+
+        // Показать форму для создания нового автора
+        document.getElementById('create-author').addEventListener('click', () => {
+            document.getElementById('create-author-form').style.display = 'block';
+        });
+
+        // Отправить форму
+        document.getElementById('submit-author').addEventListener('click', createAuthor);
+
+        // Скрыть форму
+        document.getElementById('cancel-create').addEventListener('click', () => {
+            document.getElementById('create-author-form').style.display = 'none';
+        });
+
+        // Загрузить авторов при загрузке страницы
+        document.getElementById('load-authors').addEventListener('click', loadAuthors);
+    </script>
+</body>
+</html>
