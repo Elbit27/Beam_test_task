@@ -8,3 +8,4 @@ django-filter
 django-cors-headers
 channels
 channels_redis
+gunicorn
